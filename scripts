@@ -1,16 +1,21 @@
-python src/align/align_dataset_mtcnn.py \
+python -W ignore src/align/align_dataset_mtcnn.py \
     ~/datasets/silicon_valley/raw/ \
     ~/datasets/silicon_valley/mtcnnpy_160 \
     --image_size 160 --margin 32
 
-python src/classifier.py TRAIN \
+python -W ignore src/classifier.py TRAIN \
     ~/datasets/silicon_valley/mtcnnpy_160/ \
     models/20180402-114759/ \
-    models/classifiers/silicon_valley_2_class.pkl \
-    --nrof_train_images_per_class 10
+    models/classifiers/silicon_valley_svc_linear.pkl \
+    --use_split_dataset \
+    --output_file models/classifiers/silicon_valley_svc_linear_training_set.txt
 
 
-python src/classifier.py CLASSIFY \
-    ~/datasets/silicon_valley/test/ \
+python -W ignore src/classifier.py CLASSIFY \
+    ~/datasets/silicon_valley/mtcnnpy_160 \
     models/20180402-114759/ \
-    models/classifiers/silicon_valley_2_class.pkl
+    models/classifiers/silicon_valley_svc_linear.pkl \
+    --use_split_dataset \
+    --output_file models/classifiers/silicon_valley_svc_linear_results.txt
+
+
