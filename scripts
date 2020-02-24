@@ -14,3 +14,24 @@ python src/classifier.py CLASSIFY \
     ~/datasets/silicon_valley/test/ \
     models/20180402-114759/ \
     models/classifiers/silicon_valley_2_class.pkl
+
+
+python src/validate_on_lfw.py \
+/Users/filippofrillici/PycharmProjects/facenet/datasets/lfw/lfw_mtcnnpy_160 \
+/Users/filippofrillici/PycharmProjects/facenet/models/facenet/20180402-114759 \
+--distance_metric 1 \
+--use_flipped_images \
+--subtract_mean \
+--use_fixed_image_standardization
+
+python src/align/align_dataset_mtcnn.py ./datasets/lfw/raw ./datasets/lfw/lfw_mtcnnpy_160 --image_size 160 --margin 32 --random_order --gpu_memory_fraction 0.25
+
+python src/classifier.py \
+TRAIN \
+/Users/filippofrillici/PycharmProjects/facenet/datasets/prova_dataset/aligned /Users/filippofrillici/PycharmProjects/facenet/models/facenet/20180402-114759 /Users/filippofrillici/PycharmProjects/facenet/models/classifiers/famous_classifier.pkl --batch_size 1000
+
+python src/classifier.py \
+CLASSIFY \
+/Users/filippofrillici/PycharmProjects/facenet/datasets/prova_dataset/test /Users/filippofrillici/PycharmProjects/facenet/models/facenet/20180402-114759/20180402-114759.pb /Users/filippofrillici/PycharmProjects/facenet/models/classifiers/famous_classifier.pkl --batch_size 1000
+
+find . -name '.DS_Store' -type f -delete
