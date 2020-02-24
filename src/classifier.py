@@ -154,9 +154,9 @@ def parse_arguments(argv):
     parser.add_argument('--batch_size', type=int, help='Number of images to process in a batch.', default=90)
     parser.add_argument('--image_size', type=int, help='Image size (height, width) in pixels.', default=160)
     parser.add_argument('--seed', type=int, help='Random seed.', default=666)
-    parser.add_argument('--min_nrof_images_per_class', type=int, help='Only include classes with at least this number of images in the dataset', default=20)
+    parser.add_argument('--min_nrof_images_per_class', type=int, help='Only include classes with at least this number of images in the dataset', default=10)
     parser.add_argument('--nrof_train_images_per_class', type=int, help='Use this number of images from each class for training and the rest for testing',
-                        default=10)
+                        default=5)
 
     return parser.parse_args(argv)
 
