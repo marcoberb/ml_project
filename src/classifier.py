@@ -34,6 +34,7 @@ import os
 import sys
 import math
 import pickle
+import datetime
 from sklearn.svm import SVC
 from tabulate import tabulate
 
@@ -47,8 +48,10 @@ def main(args):
             np.random.seed(seed=args.seed)
 
             if args.use_split_dataset:
+
                 dataset_tmp = facenet.get_dataset(args.data_dir)
                 train_set, test_set = split_dataset(dataset_tmp, args.min_nrof_images_per_class, args.nrof_train_images_per_class)
+
                 if args.mode == 'TRAIN':
                     dataset = train_set
                 elif args.mode == 'CLASSIFY':
@@ -119,7 +122,7 @@ def main(args):
                 predictions = model.predict_proba(emb_array)
 
                 # Saving results to file
-                create_result_table(class_names, paths, predictions, labels, args.output_file)
+                create_result_table_file(class_names, paths, predictions, labels, args.output_file)
 
 
 # Save to file a table containing used training set
@@ -134,13 +137,14 @@ def create_training_set_file(paths, filename):
 
     print("Printing training set on textfile")
     file = open(filename, "w+")
-    file.write("IMG USED AS TRAINING SET:\n")
+    file.write(str(datetime.datetime.now()))
+    file.write("\nIMG USED AS TRAINING SET:\n")
     file.write(table)
     file.close()
 
 
 # Save to file a table of 'predictions' organized by 'class_names' for each img specified in 'paths'
-def create_result_table(class_names, paths, predictions, labels, filename):
+def create_result_table_file(class_names, paths, predictions, labels, filename):
 
     indexes = []
     rows = []
@@ -163,21 +167,26 @@ def create_result_table(class_names, paths, predictions, labels, filename):
 
     print("Printing results on textfile")
     file = open(filename, "w+")
+    file.write(str(datetime.datetime.now()) + "\n\n")
     file.write(formatted_table)
     file.write(accuracy)
     file.close()
 
 
 def split_dataset(dataset, min_nrof_images_per_class, nrof_train_images_per_class):
+
     train_set = []
     test_set = []
+
     for cls in dataset:
         paths = cls.image_paths
         # Remove classes with less than min_nrof_images_per_class
         if len(paths) >= min_nrof_images_per_class:
-            np.random.shuffle(paths)
+            # np.random.shuffle(paths)  # casual order of images
+            paths.sort()  # lessicographic order of images
             train_set.append(facenet.ImageClass(cls.name, paths[:nrof_train_images_per_class]))
             test_set.append(facenet.ImageClass(cls.name, paths[nrof_train_images_per_class:]))
+
     return train_set, test_set
 
 
