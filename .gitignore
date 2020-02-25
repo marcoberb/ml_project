@@ -64,3 +64,9 @@ models/
 venv/
 
 .idea/
+
+#datasets
+datasets
+
+#scripts
+scripts
