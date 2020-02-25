@@ -65,5 +65,13 @@ venv/
 
 .idea/
 
+<<<<<<< HEAD
 # dataset
 datasets/
+=======
+#datasets
+datasets
+
+#scripts
+scripts
+>>>>>>> master
