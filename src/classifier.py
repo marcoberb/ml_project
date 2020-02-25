@@ -35,6 +35,7 @@ import sys
 import math
 import pickle
 from sklearn.svm import SVC
+from tabulate import tabulate
 
 
 def main(args):
@@ -79,6 +80,7 @@ def main(args):
             nrof_images = len(paths)
             nrof_batches_per_epoch = int(math.ceil(1.0 * nrof_images / args.batch_size))
             emb_array = np.zeros((nrof_images, embedding_size))
+
             for i in range(nrof_batches_per_epoch):
                 start_index = i * args.batch_size
                 end_index = min((i + 1) * args.batch_size, nrof_images)
@@ -103,6 +105,9 @@ def main(args):
                     pickle.dump((model, class_names), outfile)
                 print('Saved classifier model to file "%s"' % classifier_filename_exp)
 
+                # Saving training set to file
+                create_training_set_file(paths, args.output_file)
+
             elif args.mode == 'CLASSIFY':
                 # Classify images
                 print('Testing classifier')
@@ -112,14 +117,55 @@ def main(args):
                 print('Loaded classifier model from file "%s"' % classifier_filename_exp)
 
                 predictions = model.predict_proba(emb_array)
-                best_class_indices = np.argmax(predictions, axis=1)
-                best_class_probabilities = predictions[np.arange(len(best_class_indices)), best_class_indices]
 
-                for i in range(len(best_class_indices)):
-                    print('%4d  %s: %.3f' % (i, class_names[best_class_indices[i]], best_class_probabilities[i]))
+                # Saving results to file
+                create_result_table(class_names, paths, predictions, labels, args.output_file)
 
-                accuracy = np.mean(np.equal(best_class_indices, labels))
-                print('Accuracy: %.3f' % accuracy)
+
+# Save to file a table containing used training set
+def create_training_set_file(paths, filename):
+
+    img_names = []
+
+    for p in paths:
+        img_names.append(p.split('/')[-1])
+
+    table = tabulate({"img_name": img_names}, tablefmt="github")
+
+    print("Printing training set on textfile")
+    file = open(filename, "w+")
+    file.write("IMG USED AS TRAINING SET:\n")
+    file.write(table)
+    file.close()
+
+
+# Save to file a table of 'predictions' organized by 'class_names' for each img specified in 'paths'
+def create_result_table(class_names, paths, predictions, labels, filename):
+
+    indexes = []
+    rows = []
+
+    for p in paths:
+        indexes.append(p.split('/')[-1])
+
+    best_class_indices = np.argmax(predictions, axis=1)
+
+    for pred, i in zip(predictions, range(0, len(best_class_indices))):
+        row = np.append(pred, class_names[best_class_indices[i]])
+        rows.append(row)
+
+    table = rows
+    headers = ["img_name"] + class_names + ["predicted_class"]
+    formatted_table = tabulate(table, headers, tablefmt="github", showindex=indexes)
+
+    accuracy = np.mean(np.equal(best_class_indices, labels))
+    accuracy = "\n\nAccuracy: %.3f" % accuracy
+
+    print("Printing results on textfile")
+    file = open(filename, "w+")
+    file.write(formatted_table)
+    file.write(accuracy)
+    file.close()
 
 
 def split_dataset(dataset, min_nrof_images_per_class, nrof_train_images_per_class):
@@ -154,9 +200,11 @@ def parse_arguments(argv):
     parser.add_argument('--batch_size', type=int, help='Number of images to process in a batch.', default=90)
     parser.add_argument('--image_size', type=int, help='Image size (height, width) in pixels.', default=160)
     parser.add_argument('--seed', type=int, help='Random seed.', default=666)
-    parser.add_argument('--min_nrof_images_per_class', type=int, help='Only include classes with at least this number of images in the dataset', default=10)
+    parser.add_argument('--min_nrof_images_per_class', type=int, help='Only include classes with at least this number of images in the dataset', default=20)
     parser.add_argument('--nrof_train_images_per_class', type=int, help='Use this number of images from each class for training and the rest for testing',
-                        default=5)
+                        default=10)
+    parser.add_argument('--output_file', type=str, help='Path to file where will be saved training set instances (when TRAIN mode) or classification '
+                                                        'results (when CLASSIFY mode)', default='./results.txt')
 
     return parser.parse_args(argv)
 
