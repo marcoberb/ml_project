@@ -36,6 +36,8 @@ import math
 import pickle
 from sklearn.svm import SVC
 from tabulate import tabulate
+from sklearn import svm, datasets
+from sklearn.model_selection import GridSearchCV
 
 
 def main(args):
@@ -96,6 +98,13 @@ def main(args):
                 print('Training classifier')
                 model = SVC(kernel='linear', probability=True)
                 model.fit(emb_array, labels)
+
+                parameters = {'kernel': ('linear', 'rbf', 'poly'), 'C': [1, 10]}
+                svc = SVC(kernel='linear', probability=True)
+                modeldue = GridSearchCV(svc, parameters)
+                modeldue.fit(emb_array, labels)
+                print("prova")
+                print(modeldue.cv_results_)
 
                 # Create a list of class names
                 class_names = [cls.name.replace('_', ' ') for cls in dataset]
