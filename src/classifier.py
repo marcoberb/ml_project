@@ -96,15 +96,15 @@ def main(args):
             if args.mode == 'TRAIN':
                 # Train classifier
                 print('Training classifier')
-                model = SVC(kernel='linear', probability=True)
+                model = SVC(kernel='linear', probability=True, C=200)
                 model.fit(emb_array, labels)
 
-                parameters = {'kernel': ('linear', 'rbf', 'poly'), 'C': [1, 10]}
-                svc = SVC(kernel='linear', probability=True)
-                modeldue = GridSearchCV(svc, parameters)
-                modeldue.fit(emb_array, labels)
-                print("prova")
-                print(modeldue.cv_results_)
+ #               parameters = {'kernel': ('linear', 'rbf', 'poly'), 'C': [1, 10]}
+ #               svc = SVC(kernel='linear', probability=True)
+ #               modeldue = GridSearchCV(svc, parameters)
+ #               modeldue.fit(emb_array, labels)
+ #               print("prova")
+ #               print(modeldue.cv_results_)
 
                 # Create a list of class names
                 class_names = [cls.name.replace('_', ' ') for cls in dataset]
@@ -126,6 +126,8 @@ def main(args):
                 print('Loaded classifier model from file "%s"' % classifier_filename_exp)
 
                 predictions = model.predict_proba(emb_array)
+                print("numero di SV")
+                print(model.n_support_)
 
                 # Saving results to file
                 create_result_table(class_names, paths, predictions, labels, args.output_file)
@@ -211,7 +213,7 @@ def parse_arguments(argv):
     parser.add_argument('--seed', type=int, help='Random seed.', default=666)
     parser.add_argument('--min_nrof_images_per_class', type=int, help='Only include classes with at least this number of images in the dataset', default=20)
     parser.add_argument('--nrof_train_images_per_class', type=int, help='Use this number of images from each class for training and the rest for testing',
-                        default=10)
+                        default=20)
     parser.add_argument('--output_file', type=str, help='Path to file where will be saved training set instances (when TRAIN mode) or classification '
                                                         'results (when CLASSIFY mode)', default='./results.txt')
 
