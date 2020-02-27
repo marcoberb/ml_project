@@ -35,7 +35,7 @@ import sys
 import math
 import pickle
 import datetime
-from sklearn.svm import SVC
+from sklearn.svm import SVC, NuSVC
 from tabulate import tabulate
 
 
@@ -48,10 +48,8 @@ def main(args):
             np.random.seed(seed=args.seed)
 
             if args.use_split_dataset:
-
                 dataset_tmp = facenet.get_dataset(args.data_dir)
                 train_set, test_set = split_dataset(dataset_tmp, args.min_nrof_images_per_class, args.nrof_train_images_per_class)
-
                 if args.mode == 'TRAIN':
                     dataset = train_set
                 elif args.mode == 'CLASSIFY':
@@ -84,6 +82,8 @@ def main(args):
             nrof_batches_per_epoch = int(math.ceil(1.0 * nrof_images / args.batch_size))
             emb_array = np.zeros((nrof_images, embedding_size))
 
+            print("Number of batches per epoch:", nrof_batches_per_epoch)
+
             for i in range(nrof_batches_per_epoch):
                 start_index = i * args.batch_size
                 end_index = min((i + 1) * args.batch_size, nrof_images)
@@ -97,7 +97,9 @@ def main(args):
             if args.mode == 'TRAIN':
                 # Train classifier
                 print('Training classifier')
-                model = SVC(kernel='linear', probability=True)
+
+                model = SVC(C=10, kernel='linear', probability=True)
+                # model = NuSVC(nu=0.1, kernel='linear', probability=True)
                 model.fit(emb_array, labels)
 
                 # Create a list of class names
@@ -121,8 +123,11 @@ def main(args):
 
                 predictions = model.predict_proba(emb_array)
 
+                # predictions = model.predict(emb_array)
+                # print(predictions)
+
                 # Saving results to file
-                create_result_table_file(class_names, paths, predictions, labels, args.output_file)
+                create_result_table(class_names, paths, predictions, labels, args.output_file)
 
 
 # Save to file a table containing used training set
@@ -137,14 +142,13 @@ def create_training_set_file(paths, filename):
 
     print("Printing training set on textfile")
     file = open(filename, "w+")
-    file.write(str(datetime.datetime.now()))
-    file.write("\nIMG USED AS TRAINING SET:\n")
+    file.write("IMG USED AS TRAINING SET:\n")
     file.write(table)
     file.close()
 
 
 # Save to file a table of 'predictions' organized by 'class_names' for each img specified in 'paths'
-def create_result_table_file(class_names, paths, predictions, labels, filename):
+def create_result_table(class_names, paths, predictions, labels, filename):
 
     indexes = []
     rows = []
@@ -153,40 +157,41 @@ def create_result_table_file(class_names, paths, predictions, labels, filename):
         indexes.append(p.split('/')[-1])
 
     best_class_indices = np.argmax(predictions, axis=1)
+    tot_scores = 0
 
     for pred, i in zip(predictions, range(0, len(best_class_indices))):
+        tot_scores += pred[best_class_indices[i]]
         row = np.append(pred, class_names[best_class_indices[i]])
         rows.append(row)
+
+    average_score = tot_scores / len(best_class_indices)
+    str_average_score = "\n\nAverage score: %.3f" % average_score
 
     table = rows
     headers = ["img_name"] + class_names + ["predicted_class"]
     formatted_table = tabulate(table, headers, tablefmt="github", showindex=indexes)
 
     accuracy = np.mean(np.equal(best_class_indices, labels))
-    accuracy = "\n\nAccuracy: %.3f" % accuracy
+    str_accuracy = "\n\nAccuracy: %.3f" % accuracy
 
     print("Printing results on textfile")
     file = open(filename, "w+")
-    file.write(str(datetime.datetime.now()) + "\n\n")
     file.write(formatted_table)
-    file.write(accuracy)
+    file.write(str_accuracy)
+    file.write(str_average_score)
     file.close()
 
 
 def split_dataset(dataset, min_nrof_images_per_class, nrof_train_images_per_class):
-
     train_set = []
     test_set = []
-
     for cls in dataset:
         paths = cls.image_paths
         # Remove classes with less than min_nrof_images_per_class
         if len(paths) >= min_nrof_images_per_class:
-            # np.random.shuffle(paths)  # casual order of images
-            paths.sort()  # lessicographic order of images
+            np.random.shuffle(paths)
             train_set.append(facenet.ImageClass(cls.name, paths[:nrof_train_images_per_class]))
             test_set.append(facenet.ImageClass(cls.name, paths[nrof_train_images_per_class:]))
-
     return train_set, test_set
 
 
@@ -206,7 +211,7 @@ def parse_arguments(argv):
                              'Otherwise a separate test set can be specified using the test_data_dir option.', action='store_true')
 
     parser.add_argument('--test_data_dir', type=str, help='Path to the test data directory containing aligned images used for testing.')
-    parser.add_argument('--batch_size', type=int, help='Number of images to process in a batch.', default=90)
+    parser.add_argument('--batch_size', type=int, help='Number of images to process in a batch.', default=1000)
     parser.add_argument('--image_size', type=int, help='Image size (height, width) in pixels.', default=160)
     parser.add_argument('--seed', type=int, help='Random seed.', default=666)
     parser.add_argument('--min_nrof_images_per_class', type=int, help='Only include classes with at least this number of images in the dataset', default=20)

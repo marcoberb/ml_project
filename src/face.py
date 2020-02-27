@@ -40,9 +40,9 @@ from scipy import misc
 import align.detect_face
 import facenet
 
-gpu_memory_fraction = 0.3
+gpu_memory_fraction = 1
 facenet_model_checkpoint = os.path.dirname(__file__) + "/../models/20180402-114759/"
-classifier_model = os.path.dirname(__file__) + "/../models/classifiers/silicon_valley_svc_linear.pkl"
+classifier_model = os.path.dirname(__file__) + "/../models/classifiers/silicon_valley/svc_linear_C=1.pkl"
 debug = False
 
 

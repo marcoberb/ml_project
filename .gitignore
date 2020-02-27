@@ -57,10 +57,9 @@ docs/_build/
 # PyBuilder
 target/
 
-# models
-models/
-
 # virtual env
 venv/
 
 .idea/
+
+models/
