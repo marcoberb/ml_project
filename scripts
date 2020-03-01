@@ -3,38 +3,39 @@ python src/align/align_dataset_mtcnn.py \
     ~/datasets/silicon_valley/mtcnnpy_160 \
     --image_size 160 --margin 32
 
-python src/classifier.py TRAIN \
+
+-----------------SILICON VALLEY----------------------------
+
+python -W ignore src/classifier.py TRAIN \
     ~/datasets/silicon_valley/mtcnnpy_160/ \
-    models/20180402-114759/ \
-    models/classifiers/silicon_valley_2_class.pkl \
-    --nrof_train_images_per_class 10
+    models/20180402-114759/20180402-114759.pb \
+    models/classifiers/silicon_valley/svc_linear_C=10.pkl \
+    --use_split_dataset \
+    --output_file models/classifiers/silicon_valley/svc_linear_C=10_training_set.txt ;
+
+python -W ignore src/classifier.py CLASSIFY \
+    ~/datasets/silicon_valley/mtcnnpy_160/ \
+    models/20180402-114759/20180402-114759.pb \
+    models/classifiers/silicon_valley/svc_linear_C=10.pkl \
+    --use_split_dataset \
+    --output_file models/classifiers/silicon_valley/svc_linear_C=10_results.txt
 
 
-python src/classifier.py CLASSIFY \
-    ~/datasets/silicon_valley/test/ \
-    models/20180402-114759/ \
-    models/classifiers/silicon_valley_2_class.pkl
+----------------LFW_20--------------------------------------
+
+python -W ignore src/classifier.py TRAIN \
+    ~/datasets/lfw_20/mtcnnpy_160/ \
+    models/20180402-114759/20180402-114759.pb \
+    models/classifiers/lfw_20/svc_linear_C=10.pkl \
+    --use_split_dataset \
+    --output_file models/classifiers/lfw_20/svc_linear_C=10_training_set.txt ;
+
+python -W ignore src/classifier.py CLASSIFY \
+    ~/datasets/lfw_20/mtcnnpy_160/ \
+    models/20180402-114759/20180402-114759.pb \
+    models/classifiers/lfw_20/svc_linear_C=10.pkl \
+    --use_split_dataset \
+    --output_file models/classifiers/lfw_20/svc_linear_C=10_results.txt
 
 
-python src/validate_on_lfw.py \
-/Users/filippofrillici/PycharmProjects/facenet/datasets/lfw/lfw_mtcnnpy_160 \
-/Users/filippofrillici/PycharmProjects/facenet/models/facenet/20180402-114759 \
---distance_metric 1 \
---use_flipped_images \
---subtract_mean \
---use_fixed_image_standardization
-
-python src/align/align_dataset_mtcnn.py ./datasets/lfw/raw ./datasets/lfw/lfw_mtcnnpy_160 --image_size 160 --margin 32 --random_order --gpu_memory_fraction 0.25
-
-python src/classifier.py \
-TRAIN \
-/Users/filippofrillici/PycharmProjects/ml-project/datasets/prova_dataset/aligned /Users/filippofrillici/PycharmProjects/ml-project/models/facenet/20180402-114759 /Users/filippofrillici/PycharmProjects/ml-project/models/classifiers/famous_classifier.pkl --batch_size 1000 --split-dataset
-
-python src/classifier.py \
-CLASSIFY \
-/Users/filippofrillici/PycharmProjects/facenet/datasets/prova_dataset/test /Users/filippofrillici/PycharmProjects/facenet/models/facenet/20180402-114759/20180402-114759.pb /Users/filippofrillici/PycharmProjects/facenet/models/classifiers/famous_classifier.pkl --batch_size 1000
-
-find . -name '.DS_Store' -type f -delete
-
-python src/predict.py \
-/Users/filippofrillici/PycharmProjects/ml_project/models/facenet/20180402-114759/20180402-114759.pb /Users/filippofrillici/PycharmProjects/ml_project/models/classifiers/famous_classifier.pkl /Users/filippofrillici/Desktop/test.jpg
+---------------------

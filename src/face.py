@@ -40,12 +40,9 @@ from scipy import misc
 import align.detect_face
 import facenet
 
-
-gpu_memory_fraction = 0.3
-#facenet_model_checkpoint = os.path.dirname(__file__).replace('src/','') + "/models/facenet/20180402-114759"
-facenet_model_checkpoint = "/Users/filippofrillici/PycharmProjects/ml_project/models/facenet/20180402-114759"
-#classifier_model = os.path.dirname(__file__).replace('src/','') + "/models/classifiers/famous_classifier.pkl"
-classifier_model = "/Users/filippofrillici/PycharmProjects/ml_project/models/classifiers/famous_classifier.pkl"
+gpu_memory_fraction = 1
+facenet_model_checkpoint = os.path.dirname(__file__) + "/../models/20180402-114759/"
+classifier_model = os.path.dirname(__file__) + "/../models/classifiers/silicon_valley/svc_linear_C=1.pkl"
 debug = False
 
 

@@ -57,21 +57,9 @@ docs/_build/
 # PyBuilder
 target/
 
-# models
-models/
-
 # virtual env
 venv/
 
 .idea/
 
-<<<<<<< HEAD
-# dataset
-datasets/
-=======
-#datasets
-datasets
-
-#scripts
-scripts
->>>>>>> master
+models/

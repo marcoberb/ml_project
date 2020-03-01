@@ -42,6 +42,7 @@ import math
 from six import iteritems
 
 
+# NOT USED
 def triplet_loss(anchor, positive, negative, alpha):
     """Calculate the triplet loss according to the FaceNet paper
     
@@ -49,10 +50,11 @@ def triplet_loss(anchor, positive, negative, alpha):
       anchor: the embeddings for the anchor images.
       positive: the embeddings for the positive images.
       negative: the embeddings for the negative images.na
-  
+
     Returns:
       the triplet loss according to the FaceNet paper as a float tensor.
     """
+
     with tf.variable_scope('triplet_loss'):
         pos_dist = tf.reduce_sum(tf.square(tf.subtract(anchor, positive)), 1)
         neg_dist = tf.reduce_sum(tf.square(tf.subtract(anchor, negative)), 1)
@@ -63,10 +65,12 @@ def triplet_loss(anchor, positive, negative, alpha):
     return loss
 
 
+# NOT USED
 def center_loss(features, label, alfa, nrof_classes):
     """Center loss based on the paper "A Discriminative Feature Learning Approach for Deep Face Recognition"
        (http://ydwen.github.io/papers/WenECCV16.pdf)
     """
+
     nrof_features = features.get_shape()[1]
     centers = tf.get_variable('centers', [nrof_classes, nrof_features], dtype=tf.float32,
                               initializer=tf.constant_initializer(0), trainable=False)
@@ -80,14 +84,18 @@ def center_loss(features, label, alfa, nrof_classes):
 
 
 def get_image_paths_and_labels(dataset):
+
     image_paths_flat = []
     labels_flat = []
+
     for i in range(len(dataset)):
         image_paths_flat += dataset[i].image_paths
         labels_flat += [i] * len(dataset[i].image_paths)
+
     return image_paths_flat, labels_flat
 
 
+# NOT USED
 def shuffle_examples(image_paths, labels):
     shuffle_list = list(zip(image_paths, labels))
     random.shuffle(shuffle_list)
@@ -108,6 +116,7 @@ FIXED_STANDARDIZATION = 8
 FLIP = 16
 
 
+# NOT USED
 def create_input_pipeline(input_queue, image_size, nrof_preprocess_threads, batch_size_placeholder):
     images_and_labels_list = []
     for _ in range(nrof_preprocess_threads):
@@ -338,12 +347,13 @@ class ImageClass():
 
 
 def get_dataset(path, has_class_directories=True):
+
     dataset = []
     path_exp = os.path.expanduser(path)
-    classes = [path for path in os.listdir(path_exp) \
-               if os.path.isdir(os.path.join(path_exp, path))]
+    classes = [path for path in os.listdir(path_exp) if os.path.isdir(os.path.join(path_exp, path))]
     classes.sort()
     nrof_classes = len(classes)
+
     for i in range(nrof_classes):
         class_name = classes[i]
         facedir = os.path.join(path_exp, class_name)
@@ -354,13 +364,18 @@ def get_dataset(path, has_class_directories=True):
 
 
 def get_image_paths(facedir):
+
     image_paths = []
+
     if os.path.isdir(facedir):
         images = os.listdir(facedir)
         image_paths = [os.path.join(facedir, img) for img in images]
+
     return image_paths
 
 
+
+# NOT USED
 def split_dataset(dataset, split_ratio, min_nrof_images_per_class, mode):
     if mode == 'SPLIT_CLASSES':
         nrof_classes = len(dataset)
@@ -390,6 +405,7 @@ def split_dataset(dataset, split_ratio, min_nrof_images_per_class, mode):
 def load_model(model, input_map=None):
     # Check if the model is a model directory (containing a metagraph and a checkpoint file)
     #  or if it is a protobuf file with a frozen graph
+
     model_exp = os.path.expanduser(model)
     if os.path.isfile(model_exp):
         print('Model filename: %s' % model_exp)
