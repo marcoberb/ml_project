@@ -1,6 +1,5 @@
 # coding=utf-8
 """Performs face detection in realtime.
-
 Based on code from https://github.com/shanren7/real_time_face_recognition
 """
 # MIT License

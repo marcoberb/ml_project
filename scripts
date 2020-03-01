@@ -1,4 +1,4 @@
-python -W ignore src/align/align_dataset_mtcnn.py \
+python src/align/align_dataset_mtcnn.py \
     ~/datasets/silicon_valley/raw/ \
     ~/datasets/silicon_valley/mtcnnpy_160 \
     --image_size 160 --margin 32
