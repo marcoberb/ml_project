@@ -98,7 +98,7 @@ def main(args):
                 # Train classifier
                 print('Training classifier')
 
-                model = SVC(C=10, kernel='linear', probability=True)
+                model = SVC(C=1, kernel='linear', probability=True)
                 # model = NuSVC(nu=0.1, kernel='linear', probability=True)
                 model.fit(emb_array, labels)
 

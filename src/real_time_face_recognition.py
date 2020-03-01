@@ -34,8 +34,8 @@ import logging
 import face
 
 # IP_CAM
-global url_ipcam
-url_ipcam = "http://10.25.254.165:8080/shot.jpg"  # change this when ipcam app is on another URL
+#global url_ipcam
+#url_ipcam = "http://10.25.254.165:8080/shot.jpg"  # change this when ipcam app is on another URL
 
 
 # returns image retrieved from url
@@ -76,7 +76,7 @@ def main(args):
     frame_rate = 0
     frame_count = 0
 
-    # video_capture = cv2.VideoCapture(0)
+    video_capture = cv2.VideoCapture(0)
     face_recognition = face.Recognition()
     start_time = time.time()
 
@@ -87,9 +87,9 @@ def main(args):
     while True:
 
         # Capture frame-by-frame
-        # ret, frame = video_capture.read()
+        ret, frame = video_capture.read()
 
-        ret, frame = get_img_from_ipcam(url_ipcam)
+        #ret, frame = get_img_from_ipcam(url_ipcam)
 
         if ret:
 
@@ -116,7 +116,7 @@ def main(args):
             print("error retrieving img, ret = ", ret)
 
     # When everything is done, release the capture
-    # video_capture.release()
+    video_capture.release()
     cv2.destroyAllWindows()
 
 
