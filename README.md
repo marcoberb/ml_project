@@ -1,3 +1,1 @@
-Progetto per l'esame di Machine Learning e Sistemi Intelligenti per Internet<br/>
-Berbeglia Marco<br/>
-Frillici Filippo
+University project relized for Machine Learning class with my classmate [Filippo Frillici](https://github.com/DarthGalm).
